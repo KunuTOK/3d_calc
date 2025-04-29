@@ -1,8 +1,3 @@
-const tg = window.Telegram.WebApp;
-tg.ready();
-const { chat } = tg.initDataUnsafe;
-const chatId = chat.id;
-
 const N8N_WEBHOOK_URL =
   "https://bethichurig.beget.app/webhook/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4";
 
@@ -41,6 +36,16 @@ const materials = {
   PA12: [1.01, 10.41 * 5, "нейлон, инженерный"],
   PSU: [1.24, 18.84 * 5, "инженерный, термостойкий"],
 };
+
+let chatId = null;
+if (window.Telegram && window.Telegram.WebApp) {
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  if (tg.initDataUnsafe && tg.initDataUnsafe.chat) {
+    chatId = tg.initDataUnsafe.chat.id;
+    console.log("Telegram chatId:", chatId);
+  }
+}
 
 function sendToGoogleSheet() {
   const name = document.getElementById("userName").value.trim();
@@ -234,6 +239,7 @@ async function sendToN8N() {
   }
   // уже полученный chatId
   payload.chatId = chatId;
+
   const payload = { name, phone, task, dims, chatId };
 
   formButton.disabled = true;
