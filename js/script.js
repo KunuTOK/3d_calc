@@ -1,3 +1,6 @@
+const N8N_WEBHOOK_URL =
+  "https://bethichurig.beget.app/workflow/UI5QldWpLmkGavCT";
+
 const materials = {
   PLA: [1.24, 2.42 * 5, "жесткий, универсальный"],
   PETG: [1.27, 1.35 * 5, "жесткий, прочный"],
@@ -205,11 +208,47 @@ filterButtons.forEach((button) => {
 });
 
 // Add event listener for form submission
-const formButton = document.querySelector("#form button");
+const formButton = document.getElementById("sendBtn");
 formButton.addEventListener("click", (event) => {
-  event.preventDefault(); // Prevent default form submission
-  sendToGoogleSheet();
+  event.preventDefault();
+  sendToN8N();
 });
 
 populateMaterials();
 calculate();
+
+async function sendToN8N() {
+  const name = document.getElementById("userName").value.trim();
+  const phone = document.getElementById("userPhone").value.trim();
+  const task = document.getElementById("userTask").value.trim();
+  const dims = document.getElementById("userDims").value.trim();
+
+  if (!name || !phone || !task || !dims) {
+    alert("Пожалуйста, заполните все поля перед отправкой.");
+    return;
+  }
+
+  const payload = { name, phone, task, dims };
+
+  formButton.disabled = true;
+  formButton.textContent = "Отправка...";
+
+  try {
+    const response = await fetch(N8N_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    alert("Заявка успешно отправлена в систему!");
+    ["userName", "userPhone", "userTask", "userDims"].forEach(
+      (id) => (document.getElementById(id).value = "")
+    );
+  } catch (err) {
+    console.error(err);
+    alert("Ошибка отправки в N8N. Попробуйте ещё раз.");
+  } finally {
+    formButton.disabled = false;
+    formButton.textContent = "Отправить";
+  }
+}
