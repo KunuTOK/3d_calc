@@ -237,8 +237,6 @@ async function sendToN8N() {
     alert("Пожалуйста, заполните все поля перед отправкой.");
     return;
   }
-  // уже полученный chatId
-  payload.chatId = chatId;
 
   const payload = { name, phone, task, dims, chatId };
 
