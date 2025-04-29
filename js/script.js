@@ -1,3 +1,8 @@
+const tg = window.Telegram.WebApp;
+tg.ready();
+const { chat } = tg.initDataUnsafe;
+const chatId = chat.id;
+
 const N8N_WEBHOOK_URL =
   "https://bethichurig.beget.app/webhook/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4";
 
@@ -227,8 +232,9 @@ async function sendToN8N() {
     alert("Пожалуйста, заполните все поля перед отправкой.");
     return;
   }
-
-  const payload = { name, phone, task, dims };
+  // уже полученный chatId
+  payload.chatId = chatId;
+  const payload = { name, phone, task, dims, chatId };
 
   formButton.disabled = true;
   formButton.textContent = "Отправка...";
