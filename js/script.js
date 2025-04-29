@@ -1,5 +1,5 @@
 const N8N_WEBHOOK_URL =
-  "https://bethichurig.beget.app/workflow/UI5QldWpLmkGavCT";
+  "https://bethichurig.beget.app/webhook-test/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4https://bethichurig.beget.app/webhook/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4";
 
 const materials = {
   PLA: [1.24, 2.42 * 5, "жесткий, универсальный"],
