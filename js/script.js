@@ -23,28 +23,40 @@ const materials = {
   "BIOCIDE PETG": [1.27, 2.86 * 5, "антибактериальный"],
   "TPU GF (нов)": [1.25, 4.81 * 5, "гибкий, усиленный стеклом"],
   "PA 1284": [1.13, 9.56 * 5, "прочный, инженерный"],
-  "PEEK (500г)": [1.32, 50.77 * 5, "высокотемпературный, суперполимер"],
-  "PEEK CF (500г)": [1.42, 56.74 * 5, "PEEK армированный углём"],
-  "PEEK GF (500г)": [1.5, 59.77 * 5, "PEEK армированный стеклом"],
+  // "PEEK (500г)": [1.32, 50.77 * 5, "высокотемпературный, суперполимер"],
+  // "PEEK CF (500г)": [1.42, 56.74 * 5, "PEEK армированный углём"],
+  // "PEEK GF (500г)": [1.5, 59.77 * 5, "PEEK армированный стеклом"],
   SBS: [1.04, 2.02 * 5, "ударопрочный, прозрачный"],
   "PC GF": [1.3, 4.25 * 5, "жаропрочный, армированный стеклом"],
-  PVDF: [1.75, 60.36 * 5, "фторопласт, химстойкий"],
+  // PVDF: [1.75, 60.36 * 5, "фторопласт, химстойкий"],
   PVA: [1.22, 5.39 * 5, "водорастворимый, для поддержек"],
   ULTRAX: [1.4, 8.03 * 5, "инженерный, износостойкий"],
   "PP GF": [1.1, 4.46 * 5, "полипропилен армированный стеклом"],
-  "PEI 9085": [1.27, 65.53 * 5, "авиационный, термостойкий"],
+  // "PEI 9085": [1.27, 65.53 * 5, "авиационный, термостойкий"],
   PA12: [1.01, 10.41 * 5, "нейлон, инженерный"],
-  PSU: [1.24, 18.84 * 5, "инженерный, термостойкий"],
+  // PSU: [1.24, 18.84 * 5, "инженерный, термостойкий"],
 };
 
 let chatId = null;
 if (window.Telegram && window.Telegram.WebApp) {
   const tg = window.Telegram.WebApp;
   tg.ready();
-  if (tg.initDataUnsafe && tg.initDataUnsafe.chat) {
-    chatId = tg.initDataUnsafe.chat.id;
-    console.log("Telegram chatId:", chatId);
-  }
+  // fallback на user.id, если chat отсутствует
+  const unsafe = tg.initDataUnsafe || {};
+  chatId = unsafe.chat?.id || unsafe.user?.id || null;
+  console.log("chatId =", chatId);
+}
+
+// Telegram WebApp integration
+let chatIdField = document.getElementById("chatId");
+if (window.Telegram && window.Telegram.WebApp) {
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  // берём chat.id или, если нет, user.id
+  const data = tg.initDataUnsafe || {};
+  const chatId = data.chat?.id || data.user?.id || "";
+  console.log("Telegram chatId =", chatId);
+  if (chatIdField) chatIdField.value = chatId;
 }
 
 function sendToGoogleSheet() {
@@ -232,13 +244,13 @@ async function sendToN8N() {
   const phone = document.getElementById("userPhone").value.trim();
   const task = document.getElementById("userTask").value.trim();
   const dims = document.getElementById("userDims").value.trim();
+  const chatId = document.getElementById("chatId").value;
+  const payload = { name, phone, task, dims, chatId };
 
   if (!name || !phone || !task || !dims) {
     alert("Пожалуйста, заполните все поля перед отправкой.");
     return;
   }
-
-  const payload = { name, phone, task, dims, chatId };
 
   formButton.disabled = true;
   formButton.textContent = "Отправка...";

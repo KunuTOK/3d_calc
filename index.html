@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Калькулятор стоимости 3D-печати</title>
     <link rel="stylesheet" href="css/style.css" />
+    <script async src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
     <div class="container">
@@ -73,6 +74,8 @@
 
       <div class="tab-content" id="form" style="display: none">
         <h3>Отправить заявку</h3>
+        <input type="hidden" id="chatId" value="" />
+
         <label>Имя:</label>
         <input type="text" id="userName" />
 
