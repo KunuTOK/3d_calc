@@ -53,7 +53,7 @@ if (window.Telegram && window.Telegram.WebApp) {
 
 // 3. URL вашего N8N webhook
 const N8N_WEBHOOK_URL =
-  "https://bethichurig.beget.app/workflow/UI5QldWpLmkGavCT";
+  "https://bethichurig.beget.app/webhook/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4";
 
 // 4. После загрузки DOM вешаем все обработчики и запускаем первичный расчёт
 document.addEventListener("DOMContentLoaded", () => {
