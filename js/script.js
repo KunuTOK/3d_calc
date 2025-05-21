@@ -342,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
     el.statusMsg.textContent = "Отправка...";
 
     fetch(
-      "https://bethichurig.beget.app/webhook-test/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4",
+      "https://bethichurig.beget.app/webhook/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4",
       {
         method: "POST",
         body: formData,
