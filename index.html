@@ -2,103 +2,191 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <title>Калькулятор стоимости 3D-печати</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор 3D печати</title>
     <link rel="stylesheet" href="css/style.css" />
-    <script async src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
     <div class="container">
-      <div class="tabs">
-        <button class="tab-button active" data-tab="calculator">
-          Калькулятор
-        </button>
-        <button class="tab-button" data-tab="form">Заявка</button>
+      <h1>Калькулятор 3D печати</h1>
+      <div class="filter-buttons" id="filterButtons">
+        <button data-type="all" class="active">Все</button>
+        <button data-type="инженерный">Инженерные</button>
+        <button data-type="гибкий">Гибкие</button>
+        <button data-type="жесткий">Жесткие</button>
+        <button data-type="усто">Устойчивые</button>
       </div>
-
-      <div class="tab-content active" id="calculator">
-        <h2>Калькулятор стоимости FDM 3D-печати</h2>
-
+      <div class="form-group">
         <label for="material">Материал:</label>
-        <div id="filterButtons" class="filter-buttons">
-          <button>🔍 Все</button>
-          <button>🧱 Жесткие</button>
-          <button>🧘‍♂️ Гибкие</button>
-          <button>🔬 Инженерные</button>
-        </div>
-        <input
-          type="text"
-          id="materialFilter"
-          placeholder="Поиск по описанию..."
-        />
         <select id="material"></select>
-        <div id="materialInfo"></div>
-
-        <div class="switch-group">
-          <label>Тип ввода:</label>
-          <button class="switch active" id="btnMass">Масса</button>
-          <button class="switch" id="btnVolume">Габариты</button>
-        </div>
-
-        <div id="massInput" class="input-group">
-          <div>
-            <label for="massValue">Масса (г):</label>
-            <input type="number" id="massValue" placeholder="Введите массу" />
-          </div>
-          <div>
-            <label for="quantity">Количество штук:</label>
-            <input type="number" id="quantity" value="1" />
-          </div>
-        </div>
-
-        <div id="volumeInput" class="input-group" style="display: none">
-          <div>
-            <label for="length">Длина (мм):</label>
-            <input type="number" id="length" />
-          </div>
-          <div>
-            <label for="width">Ширина (мм):</label>
-            <input type="number" id="width" />
-          </div>
-          <div>
-            <label for="height">Высота (мм):</label>
-            <input type="number" id="height" />
-          </div>
-          <div>
-            <label for="fill">Процент заполнения (%):</label>
-            <input type="number" id="fill" value="20" />
-          </div>
-        </div>
-
-        <div class="result" id="result"></div>
+        <div id="materialInfo" class="material-info"></div>
       </div>
-
-      <div class="tab-content" id="form" style="display: none">
-        <h3>Отправить заявку</h3>
-        <input type="hidden" id="chatId" value="" />
-
-        <label>Имя:</label>
-        <input type="text" id="userName" />
-
-        <label>Описание задачи:</label>
-        <textarea id="userTask"></textarea>
-
-        <label>Телефон для связи</label>
-        <input type="text" id="userPhone" placeholder="+7 (___) ___-__-__" />
-
-        <label>Размеры или масса:</label>
-        <textarea id="userDims" readonly></textarea>
-
-        <button id="sendBtn">Отправить</button>
-
-        <div style="margin-top: 10px; font-size: 13px; color: #888">
-          Цена примерная. Окончательно уточняйте у менеджера.
+      <div class="tab-buttons">
+        <button id="massTabBtn" class="active">По массе</button>
+        <button id="volumeTabBtn">По объему</button>
+      </div>
+      <div id="massTab" class="tab-content">
+        <div class="form-group">
+          <label for="massValue">Масса (г):</label>
+          <input type="number" id="massValue" min="0" step="0.1" />
         </div>
       </div>
-
-      <div class="footer">
-        <a href="https://5dsap.ru" target="_blank">5dsap.ru</a>
-        <a href="https://t.me/kunutok" target="_blank">Telegram</a>
-        <a href="https://wa.me/79607418138" target="_blank">WhatsApp</a>
+      <div id="volumeTab" class="tab-content hidden">
+        <div class="shape-buttons" id="shapeButtons">
+          <button data-shape="box" class="active">Параллелепипед</button>
+          <button data-shape="cylinder">Цилиндр</button>
+          <button data-shape="cone">Конус</button>
+          <button data-shape="sphere">Сфера</button>
+          <button data-shape="ring">Кольцо</button>
+        </div>
+        <div class="shape-inputs">
+          <div data-shape="box">
+            <div class="form-group">
+              <label for="length">Длина (мм):</label>
+              <input type="number" id="length" min="0" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="width">Ширина (мм):</label>
+              <input type="number" id="width" min="0" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="height">Высота (мм):</label>
+              <input type="number" id="height" min="0" step="0.1" />
+            </div>
+          </div>
+          <div data-shape="cylinder" class="hidden">
+            <div class="form-group">
+              <label for="diameter">Диаметр (мм):</label>
+              <input type="number" id="diameter" min="0" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="cylHeight">Высота (мм):</label>
+              <input type="number" id="cylHeight" min="0" step="0.1" />
+            </div>
+          </div>
+          <div data-shape="cone" class="hidden">
+            <div class="form-group">
+              <label for="coneDia">Диаметр основания (мм):</label>
+              <input type="number" id="coneDia" min="0" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="coneHeight">Высота (мм):</label>
+              <input type="number" id="coneHeight" min="0" step="0.1" />
+            </div>
+          </div>
+          <div data-shape="sphere" class="hidden">
+            <div class="form-group">
+              <label for="sphereDia">Диаметр (мм):</label>
+              <input type="number" id="sphereDia" min="0" step="0.1" />
+            </div>
+          </div>
+          <div data-shape="ring" class="hidden">
+            <div class="form-group">
+              <label for="outerDia">Внешний диаметр (мм):</label>
+              <input type="number" id="outerDia" min="0" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="innerDia">Внутренний диаметр (мм):</label>
+              <input type="number" id="innerDia" min="0" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="ringHeight">Высота (мм):</label>
+              <input type="number" id="ringHeight" min="0" step="0.1" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="quantity">Количество:</label>
+        <input type="number" id="quantity" min="1" value="1" />
+      </div>
+      <div class="form-group">
+        <label for="fill">Заполнение (%):</label>
+        <input type="number" id="fill" min="1" max="100" value="20" />
+      </div>
+      <div class="quality-buttons" id="qualityButtons">
+        <button data-quality="0.4">0.4 мм</button>
+        <button data-quality="0.2" class="active">0.2 мм</button>
+        <button data-quality="0.1">0.1 мм</button>
+      </div>
+      <div id="result" class="result"></div>
+      <div id="total" class="total hidden"></div>
+      <button id="toggleDetails" class="toggle-details active">
+        Показать детали
+      </button>
+      <div id="details" class="details">
+        <div class="form-group">
+          <label for="detailName">Название детали:</label>
+          <input type="text" id="detailName" />
+        </div>
+        <div class="form-group">
+          <label for="workDesc">Описание работы:</label>
+          <textarea id="workDesc"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="workFile">Файл для печати:</label>
+          <input type="file" id="workFile" accept=".stl,.obj,.gcode" />
+        </div>
+        <div class="form-group">
+          <label for="userName">Ваше имя:</label>
+          <input type="text" id="userName" required />
+        </div>
+        <div class="form-group">
+          <label for="userPhone">Телефон:</label>
+          <input type="tel" id="userPhone" required />
+        </div>
+        <div class="form-group">
+          <label for="userEmail">Email:</label>
+          <input type="email" id="userEmail" required />
+        </div>
+        <div class="form-group">
+          <label for="userMedia">Соцсеть:</label>
+          <select id="userMedia">
+            <option value="Пищевка">Пищевка</option>
+            <option value="ВК">ВК</option>
+            <option value="Телеграм">Телеграм</option>
+            <option value="WhatsApp">WhatsApp</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="userTemp">Температура:</label>
+          <select id="userTemp">
+            <option value="комнатная">комнатная</option>
+            <option value="повышенная">повышенная</option>
+            <option value="высокая">высокая</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="deadline">Срочность:</label>
+          <select id="deadline">
+            <option value="0.95">Обычная</option>
+            <option value="1.2">Срочная</option>
+            <option value="1.5">Очень срочная</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Параметры заказа:</label>
+          <div class="parameter-line">
+            Пластик: <span id="userPlastic"></span>
+          </div>
+          <div class="parameter-line">
+            Масса пластика: <span id="userMass"></span>
+          </div>
+          <div class="parameter-line">
+            Габариты изделия: <span id="userVolume"></span>
+          </div>
+          <div class="parameter-line">
+            Количество: <span id="userQuantity"></span>
+          </div>
+          <div class="parameter-line">
+            Заполнение: <span id="userFill"></span>
+          </div>
+          <div class="parameter-line">
+            Высота слоя: <span id="userQuality"></span>
+          </div>
+        </div>
+        <div id="statusMsg"></div>
+        <button id="sendBtn" class="send-button">Отправить заявку</button>
       </div>
     </div>
     <script src="js/script.js"></script>
