@@ -102,7 +102,7 @@
       </div>
       <div class="form-group">
         <label for="fill">Заполнение (%):</label>
-        <input type="number" id="fill" min="1" max="100" value="20" />
+        <input type="number" id="fill" min="1" max="100" value="100" />
       </div>
       <div class="quality-buttons" id="qualityButtons">
         <button data-quality="0.4">0.4 мм</button>
@@ -121,11 +121,11 @@
         </div>
         <div class="form-group">
           <label for="workDesc">Описание работы:</label>
-          <textarea id="workDesc"></textarea>
+          <textarea id="workDesc" name="workDesc" rows="3"></textarea>
         </div>
         <div class="form-group">
-          <label for="workFile">Файл для печати:</label>
-          <input type="file" id="workFile" accept=".stl,.obj,.gcode" />
+          <label for="workFile">Прикрепить файл:</label>
+          <input type="file" id="workFile" name="workFile" />
         </div>
         <div class="form-group">
           <label for="userName">Ваше имя:</label>
@@ -167,26 +167,58 @@
         <div class="form-group">
           <label>Параметры заказа:</label>
           <div class="parameter-line">
-            Пластик: <span id="userPlastic"></span>
+            <span>Пластик:</span>
+            <input type="text" id="userPlastic" readonly />
           </div>
           <div class="parameter-line">
-            Масса пластика: <span id="userMass"></span>
+            <span>Масса пластика:</span>
+            <input type="text" id="userMass" readonly />
           </div>
           <div class="parameter-line">
-            Габариты изделия: <span id="userVolume"></span>
+            <span>Габариты изделия:</span>
+            <span id="userVolume"></span>
           </div>
           <div class="parameter-line">
-            Количество: <span id="userQuantity"></span>
+            <span>Количество:</span>
+            <input type="text" id="userQuantity" readonly />
           </div>
           <div class="parameter-line">
-            Заполнение: <span id="userFill"></span>
+            <span>Заполнение:</span>
+            <input type="text" id="userFill" readonly />
           </div>
           <div class="parameter-line">
-            Высота слоя: <span id="userQuality"></span>
+            <span>Высота слоя:</span>
+            <input type="text" id="userQuality" readonly />
           </div>
         </div>
-        <div id="statusMsg"></div>
-        <button id="sendBtn" class="send-button">Отправить заявку</button>
+        <div class="checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              id="consentCheckbox"
+              name="consentCheckbox"
+              required
+            />
+            Я даю свое согласие на обработку персональных данных
+            <a
+              href="consent.html"
+              target="_blank"
+              style="margin-left: 5px; color: #4caf50; text-decoration: none"
+              >(подробнее)</a
+            >
+          </label>
+        </div>
+        <div class="operator-info">
+          <p>
+            ООО «САП», 121205, г. Москва, ИЦ «Сколково», Большой бульвар, 42,
+            стр. 1
+          </p>
+          <p>
+            ОГРН 1243400004264; ИНН 3443152368; info@5dsap.ru; +7 (926) 004-8138
+          </p>
+        </div>
+        <button type="submit" id="sendBtn" disabled>Отправить заявку</button>
+        <p id="statusMsg"></p>
       </div>
     </div>
     <script src="js/script.js"></script>

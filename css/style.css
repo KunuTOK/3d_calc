@@ -121,18 +121,32 @@ button:active {
 }
 
 .parameter-line {
-  margin: 8px 0;
-  padding: 4px 0;
-  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0;
+  font-size: 0.9em;
 }
 
-.parameter-line:last-child {
-  border-bottom: none;
+.parameter-line input {
+  width: 120px;
+  padding: 2px 4px;
+  margin-left: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  font-size: 0.9em;
 }
 
 .parameter-line span {
-  font-weight: normal;
+  margin-left: 8px;
   color: #666;
+}
+
+#userVolume {
+  width: 100%;
+  margin-top: 4px;
+  line-height: 1.4;
 }
 
 footer {
@@ -144,4 +158,36 @@ footer a {
   color: #4caf50;
   text-decoration: none;
   margin: 0 5px;
+}
+
+.operator-info {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+.operator-info p {
+  margin: 5px 0;
+}
+
+.checkbox-group {
+  margin: 20px 0;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: auto;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }

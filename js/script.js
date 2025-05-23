@@ -190,45 +190,116 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const [dens, price] = materials[sel];
     let mass = 0;
-    if (el.massBtn.classList.contains("active"))
+    let hasError = false;
+    let errorMessage = "";
+
+    if (el.massBtn.classList.contains("active")) {
       mass = parseFloat(el.massVal.value) || 0;
-    else {
+      if (mass < 0) {
+        hasError = true;
+        errorMessage = "Масса не может быть отрицательной";
+      }
+    } else {
       const shape = el.shapeBtns.querySelector("button.active").dataset.shape;
       switch (shape) {
         case "box":
-          mass =
-            (((el.length.value || 0) *
-              (el.width.value || 0) *
-              (el.height.value || 0)) /
-              1000) *
-            dens;
+          if (
+            el.length.value < 0 ||
+            el.width.value < 0 ||
+            el.height.value < 0
+          ) {
+            hasError = true;
+            errorMessage = "Размеры не могут быть отрицательными";
+          } else if (
+            el.length.value === 0 ||
+            el.width.value === 0 ||
+            el.height.value === 0
+          ) {
+            hasError = true;
+            errorMessage = "Все размеры должны быть больше нуля";
+          } else {
+            mass =
+              (((el.length.value || 0) *
+                (el.width.value || 0) *
+                (el.height.value || 0)) /
+                1000) *
+              dens;
+          }
           break;
         case "cylinder":
-          mass =
-            ((Math.PI * (el.diam.value / 2) ** 2 * (el.cylH.value || 0)) /
-              1000) *
-            dens;
+          if (el.diam.value < 0 || el.cylH.value < 0) {
+            hasError = true;
+            errorMessage = "Размеры не могут быть отрицательными";
+          } else if (el.diam.value === 0 || el.cylH.value === 0) {
+            hasError = true;
+            errorMessage = "Диаметр и высота должны быть больше нуля";
+          } else {
+            mass =
+              ((Math.PI * (el.diam.value / 2) ** 2 * (el.cylH.value || 0)) /
+                1000) *
+              dens;
+          }
           break;
         case "cone":
-          mass =
-            ((Math.PI * (el.coneD.value / 2) ** 2 * (el.coneH.value || 0)) /
-              3000) *
-            dens;
+          if (el.coneD.value < 0 || el.coneH.value < 0) {
+            hasError = true;
+            errorMessage = "Размеры не могут быть отрицательными";
+          } else if (el.coneD.value === 0 || el.coneH.value === 0) {
+            hasError = true;
+            errorMessage = "Диаметр и высота должны быть больше нуля";
+          } else {
+            mass =
+              ((Math.PI * (el.coneD.value / 2) ** 2 * (el.coneH.value || 0)) /
+                3000) *
+              dens;
+          }
           break;
         case "sphere":
-          mass =
-            (((4 / 3) * Math.PI * (el.sphereD.value / 2) ** 3) / 1000) * dens;
+          if (el.sphereD.value < 0) {
+            hasError = true;
+            errorMessage = "Диаметр не может быть отрицательным";
+          } else if (el.sphereD.value === 0) {
+            hasError = true;
+            errorMessage = "Диаметр должен быть больше нуля";
+          } else {
+            mass =
+              (((4 / 3) * Math.PI * (el.sphereD.value / 2) ** 3) / 1000) * dens;
+          }
           break;
         case "ring":
-          mass =
-            ((Math.PI *
-              ((el.oD.value / 2) ** 2 - (el.iD.value / 2) ** 2) *
-              (el.rH.value || 0)) /
-              1000) *
-            dens;
+          if (el.oD.value < 0 || el.iD.value < 0 || el.rH.value < 0) {
+            hasError = true;
+            errorMessage = "Размеры не могут быть отрицательными";
+          } else if (
+            el.oD.value === 0 ||
+            el.iD.value === 0 ||
+            el.rH.value === 0
+          ) {
+            hasError = true;
+            errorMessage = "Все размеры должны быть больше нуля";
+          } else if (parseFloat(el.oD.value) <= parseFloat(el.iD.value)) {
+            hasError = true;
+            errorMessage = "Внешний диаметр должен быть больше внутреннего";
+          } else {
+            mass =
+              ((Math.PI *
+                ((el.oD.value / 2) ** 2 - (el.iD.value / 2) ** 2) *
+                (el.rH.value || 0)) /
+                1000) *
+              dens;
+          }
           break;
       }
     }
+
+    if (hasError) {
+      el.result.innerHTML = `<span style="color: #f44336;">${errorMessage}</span>`;
+      el.total.classList.add("hidden");
+      if (el.userMass) el.userMass.value = "0 г";
+      if (el.userVolume) el.userVolume.innerHTML = "Размеры: -<br>Объем: - см³";
+      return;
+    }
+
     const fillFactor = Math.min(Math.max(el.fill.value, 1), 100) / 100;
     const qualityMap = { 0.4: 0.77, 0.2: 1, 0.1: 1.64 };
     const qFactor =
@@ -247,19 +318,57 @@ document.addEventListener("DOMContentLoaded", () => {
     if (el.userPlastic) el.userPlastic.value = sel;
     if (el.userMass) el.userMass.value = `${totalMass.toFixed(2)} г`;
     if (el.userVolume) {
-      const volume = el.volTab.classList.contains("hidden")
-        ? "-"
-        : `${
-            ((el.length.value || 0) *
-              (el.width.value || 0) *
-              (el.height.value || 0)) /
-            1000
-          } см³`;
-      const dimensions = el.volTab.classList.contains("hidden")
-        ? "-"
-        : `${el.length.value || 0}х${el.width.value || 0}х${
-            el.height.value || 0
-          } мм`;
+      const shape = el.shapeBtns.querySelector("button.active").dataset.shape;
+      let dimensions = "-";
+      let volume = "-";
+
+      if (!el.volTab.classList.contains("hidden")) {
+        switch (shape) {
+          case "box":
+            dimensions = `${el.length.value || 0}х${el.width.value || 0}х${
+              el.height.value || 0
+            } мм`;
+            volume = `${(
+              ((el.length.value || 0) *
+                (el.width.value || 0) *
+                (el.height.value || 0)) /
+              1000
+            ).toFixed(1)}`;
+            break;
+          case "cylinder":
+            dimensions = `Ø${el.diam.value || 0}х${el.cylH.value || 0} мм`;
+            volume = `${(
+              (Math.PI * (el.diam.value / 2) ** 2 * (el.cylH.value || 0)) /
+              1000
+            ).toFixed(1)}`;
+            break;
+          case "cone":
+            dimensions = `Ø${el.coneD.value || 0}х${el.coneH.value || 0} мм`;
+            volume = `${(
+              (Math.PI * (el.coneD.value / 2) ** 2 * (el.coneH.value || 0)) /
+              3000
+            ).toFixed(1)}`;
+            break;
+          case "sphere":
+            dimensions = `Ø${el.sphereD.value || 0} мм`;
+            volume = `${(
+              ((4 / 3) * Math.PI * (el.sphereD.value / 2) ** 3) /
+              1000
+            ).toFixed(1)}`;
+            break;
+          case "ring":
+            dimensions = `Ø${el.oD.value || 0}х${el.iD.value || 0}х${
+              el.rH.value || 0
+            } мм`;
+            volume = `${(
+              (Math.PI *
+                ((el.oD.value / 2) ** 2 - (el.iD.value / 2) ** 2) *
+                (el.rH.value || 0)) /
+              1000
+            ).toFixed(1)}`;
+            break;
+        }
+      }
       el.userVolume.innerHTML = `Размеры: ${dimensions}<br>Объем: ${volume} см³`;
     }
     if (el.userQuantity) el.userQuantity.value = qty;
@@ -292,6 +401,19 @@ document.addEventListener("DOMContentLoaded", () => {
   el.sendBtn.addEventListener("click", (e) => {
     e.preventDefault();
 
+    // Добавляем обработчик для чекбокса согласия
+    const consentCheckbox = document.getElementById("consentCheckbox");
+    const sendBtn = document.getElementById("sendBtn");
+
+    consentCheckbox.addEventListener("change", function () {
+      sendBtn.disabled = !this.checked;
+    });
+
+    if (!consentCheckbox.checked) {
+      alert("Необходимо дать согласие на обработку персональных данных");
+      return;
+    }
+
     // Create FormData object
     const formData = new FormData();
     formData.append("name", el.userName.value);
@@ -303,8 +425,8 @@ document.addEventListener("DOMContentLoaded", () => {
       "deadline",
       el.deadline.options[el.deadline.selectedIndex].text
     );
-    formData.append("plastic", el.userPlastic.textContent);
-    formData.append("mass", el.userMass.textContent);
+    formData.append("plastic", el.userPlastic.value);
+    formData.append("mass", el.userMass.value);
     formData.append(
       "volume",
       el.volTab.classList.contains("hidden")
@@ -324,12 +446,16 @@ document.addEventListener("DOMContentLoaded", () => {
             el.height.value || 0
           } мм`
     );
-    formData.append("quantity", el.userQuantity.textContent);
-    formData.append("fill", el.userFill.textContent);
-    formData.append("quality", el.userQuality.textContent);
+    formData.append("quantity", el.userQuantity.value);
+    formData.append("fill", el.userFill.value);
+    formData.append("quality", el.userQuality.value);
     formData.append("total", el.total.textContent);
     formData.append("detailName", el.detailName.value);
     formData.append("workDesc", el.workDesc.value);
+
+    // Добавляем информацию о согласии
+    formData.append("consentTimestamp", new Date().toISOString());
+    formData.append("consentGiven", "true");
 
     // Add file if selected
     const fileInput = document.getElementById("workFile");
