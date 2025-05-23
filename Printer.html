@@ -169,14 +169,11 @@
         this.querySelector("button").disabled = true;
         this.querySelector("button").textContent = "Отправлено!";
 
-        fetch(
-          "https://bethichurig.beget.app/webhook-test/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "phone=" + encodeURIComponent(value),
-          }
-        );
+        fetch("https://bethichurig.beget.app/webhook/printer", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: "phone=" + encodeURIComponent(value),
+        });
       });
     </script>
   </body>
