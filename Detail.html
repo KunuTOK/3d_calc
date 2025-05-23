@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Оставь номер и узнай все про печать</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", Arial, sans-serif;
+        background: linear-gradient(120deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        background: #fff;
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(60, 60, 60, 0.12);
+        padding: 40px 32px 32px 32px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+      h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+        color: #222;
+      }
+      .phone-form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .phone-form input[type="tel"] {
+        font-size: 1.1rem;
+        padding: 10px 14px;
+        border: 1px solid #b0b0b0;
+        border-radius: 8px;
+        outline: none;
+        transition: border 0.2s;
+        width: 180px;
+      }
+      .phone-form input[type="tel"]:focus {
+        border: 1.5px solid #00bfae;
+      }
+      .phone-form button {
+        background: linear-gradient(90deg, #00bfae 0%, #0077ff 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 22px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 191, 174, 0.08);
+      }
+      .phone-form button:active {
+        background: linear-gradient(90deg, #0077ff 0%, #00bfae 100%);
+      }
+      .error {
+        color: #f44336;
+        font-size: 0.98rem;
+        margin-bottom: 10px;
+        min-height: 22px;
+      }
+      @media (max-width: 480px) {
+        .container {
+          padding: 18px 4px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Оставь номер и узнай все про печать</h1>
+      <form class="phone-form" id="phoneForm" autocomplete="off">
+        <input
+          type="tel"
+          id="phoneInput"
+          name="phone"
+          placeholder="+7XXXXXXXXXX"
+          maxlength="12"
+          required
+        />
+        <button type="submit">Узнать</button>
+      </form>
+      <div class="error" id="errorMsg"></div>
+    </div>
+    <script>
+      // Phone input formatting
+      const phoneInput = document.getElementById("phoneInput");
+      phoneInput.addEventListener("input", () => {
+        let v = phoneInput.value.replace(/[^0-9+]/g, "");
+        if (v.startsWith("8")) v = "+7" + v.slice(1);
+        if (!v.startsWith("+7")) v = "+7" + v.replace(/^\+?7?/, "");
+        phoneInput.value = v.slice(0, 12);
+      });
+
+      // Form submission via fetch
+      const phoneForm = document.getElementById("phoneForm");
+      const errorMsg = document.getElementById("errorMsg");
+
+      phoneForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const value = phoneInput.value;
+        if (!/^\+7\d{10}$/.test(value)) {
+          errorMsg.textContent =
+            "Введите корректный номер в формате +7XXXXXXXXXX";
+          return;
+        }
+        errorMsg.textContent = "";
+        phoneInput.disabled = true;
+        this.querySelector("button").disabled = true;
+        this.querySelector("button").textContent = "Отправлено!";
+
+        fetch(
+          "https://bethichurig.beget.app/webhook-test/fd84ea85-fa6e-4b76-bbaa-8b8241d839c4",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "phone=" + encodeURIComponent(value),
+          }
+        );
+      });
+    </script>
+  </body>
+</html>

@@ -1,4 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Hide consent checkbox and set it to checked
+  const consentCheckbox = document.getElementById("consentCheckbox");
+  if (consentCheckbox) {
+    consentCheckbox.style.display = "none";
+    consentCheckbox.checked = true;
+  }
+
+  // Hide consent text and operator info
+  const checkboxGroup = document.querySelector(".checkbox-group");
+  const operatorInfo = document.querySelector(".operator-info");
+  if (checkboxGroup) {
+    checkboxGroup.style.display = "none";
+  }
+  if (operatorInfo) {
+    operatorInfo.style.display = "none";
+  }
+
+  // Enable send button by default
+  const sendBtn = document.getElementById("sendBtn");
+  if (sendBtn) {
+    sendBtn.disabled = false;
+  }
+
   // Данные материалов
   const materials = {
     PLA: [1.24, 2.42 * 5, "базовый, низкая химостойкость, неустойчив к УФ"],
@@ -388,29 +411,42 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.getElementById("sendBtn").addEventListener("click", (e) => {
     e.preventDefault();
-    const phoneValid = /^\+7\d{10}$/.test(phone.value);
+
+    // Validate required fields
+    const requiredFields = {
+      userName: "имя",
+      userPhone: "телефон",
+      userEmail: "email",
+      detailName: "название детали",
+    };
+
+    let hasError = false;
+    let errorMessage = "";
+
+    for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
+      const field = document.getElementById(fieldId);
+      if (!field || !field.value.trim()) {
+        hasError = true;
+        errorMessage = `Пожалуйста, заполните поле "${fieldName}"`;
+        break;
+      }
+    }
+
+    // Validate phone number format
+    if (phone && !/^\+7\d{10}$/.test(phone.value)) {
+      hasError = true;
+      errorMessage = "Телефон введён неверно";
+    }
+
+    // Validate email format
     const email = document.getElementById("userEmail");
-    if (!phoneValid) return alert("Телефон введён неверно");
-    if (!email.checkValidity()) return alert("Email введён неверно");
-    alert("Заявка отправлена");
-  });
-  el.toggleDetails.addEventListener("click", () => {
-    el.toggleDetails.classList.toggle("active");
-    el.details.classList.toggle("hidden");
-  });
-  el.sendBtn.addEventListener("click", (e) => {
-    e.preventDefault();
+    if (email && !email.checkValidity()) {
+      hasError = true;
+      errorMessage = "Email введён неверно";
+    }
 
-    // Добавляем обработчик для чекбокса согласия
-    const consentCheckbox = document.getElementById("consentCheckbox");
-    const sendBtn = document.getElementById("sendBtn");
-
-    consentCheckbox.addEventListener("change", function () {
-      sendBtn.disabled = !this.checked;
-    });
-
-    if (!consentCheckbox.checked) {
-      alert("Необходимо дать согласие на обработку персональных данных");
+    if (hasError) {
+      alert(errorMessage);
       return;
     }
 
@@ -453,10 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("detailName", el.detailName.value);
     formData.append("workDesc", el.workDesc.value);
 
-    // Добавляем информацию о согласии
-    formData.append("consentTimestamp", new Date().toISOString());
-    formData.append("consentGiven", "true");
-
     // Add file if selected
     const fileInput = document.getElementById("workFile");
     if (fileInput.files.length > 0) {
@@ -476,7 +508,7 @@ document.addEventListener("DOMContentLoaded", () => {
     )
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
@@ -495,13 +527,17 @@ document.addEventListener("DOMContentLoaded", () => {
         fileInput.value = ""; // Reset file input
       })
       .catch((error) => {
-        console.error("Error:", error);
-        el.statusMsg.textContent = "Ошибка при отправке заявки";
+        console.error("Error details:", error);
+        el.statusMsg.textContent = `Ошибка при отправке заявки: ${error.message}`;
         el.statusMsg.style.color = "#f44336";
       })
       .finally(() => {
         // Re-enable the button
         el.sendBtn.disabled = false;
       });
+  });
+  el.toggleDetails.addEventListener("click", () => {
+    el.toggleDetails.classList.toggle("active");
+    el.details.classList.toggle("hidden");
   });
 });
