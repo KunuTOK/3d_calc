@@ -1,3 +1,7 @@
+// Глобальные переменные
+let dimensionCoefficient = 1; // По умолчанию 3D
+let dimensionButtons = null; // Объявляем глобально, но пока не инициализируем
+
 document.addEventListener("DOMContentLoaded", () => {
   // Hide consent checkbox and set it to checked
   const consentCheckbox = document.getElementById("consentCheckbox");
@@ -31,14 +35,23 @@ document.addEventListener("DOMContentLoaded", () => {
       2.71 * 5,
       "инженерный, армирован стеклом, усто к УФ и химии",
     ],
-    "PETG CF": [1.3, 3.0 * 5, "инженерный, армирован углем, усто к УФ и химии"],
-    "TPU 60A": [1.2, 1.8 * 5, "гибкий, эластичный"],
-    "TPU 75A": [1.2, 2.0 * 5, "гибкий средней жёсткости"],
-    "TPU 95A": [1.2, 2.2 * 5, "жесткий, прочный"],
-    "EASY FLEX": [1.18, 1.5 * 5, "упрощённая печать"],
-    "SOFT FLEX": [1.18, 1.6 * 5, "особо мягкий"],
-    "TPU HT": [1.2, 4.0 * 5, "высокотемпературный до 100°C"],
-    "TPU CR": [1.2, 4.5 * 5, "химически стойкий"],
+    "PETG CF": [
+      1.3,
+      3.0 * 5,
+      "инженерный, армирован углем, устойчив к УФ и химии",
+    ],
+    "TPU 60A": [1.2, 15 * 5, "гибкий, эластичный"],
+    "SEBS RUBER": [
+      1.03,
+      15 * 5,
+      "гибкий, эластичный, медицына, пищевка, устойчик к УФ",
+    ],
+    "TPU 75A": [1.2, 15 * 5, "гибкий средней жёсткости"],
+    "TPU 95A": [1.2, 15 * 5, "жесткий, прочный"],
+    "TPU A95 EASY FLEX": [1.18, 15 * 5, "упрощённая печать"],
+    "TPU A70 SOFT FLEX": [1.18, 15 * 5, "особо мягкий"],
+    "TPU HT": [1.2, 15 * 5, "высокотемпературный до 100°C"],
+    "TPU CR": [1.2, 15 * 5, "химически стойкий"],
     PA6: [
       1.14,
       4.05 * 5,
@@ -68,10 +81,19 @@ document.addEventListener("DOMContentLoaded", () => {
     PVA: [1.22, 5.39 * 5, "водорастворимый, вспомогательный"],
     PA1284: [1.13, 9.56 * 5, "инженерный, устойчив к УФ и химии"],
     SBS: [1.04, 2.02 * 5, "ударопрочный, прозрачный; средняя химостойкость"],
-    ULTRAX: [1.4, 8.03 * 5, "POM, высокая износостойкость, усто к УФ и химии"],
+    "PA6 CF ULTRAX": [
+      1.4,
+      8.03 * 5,
+      "POM, высокая износостойкость, усто к УФ и химии",
+    ],
     "PC GF": [1.3, 4.25 * 5, "армирован стеклом, усто к УФ"],
     "PP GF": [1.1, 4.46 * 5, "армирован стеклом, высокая химостойкость"],
-    BIOCIDE: [1.27, 2.86 * 5, "антибактериальный, средняя химостойкость"],
+    PVA: [1.25, 6 * 5, "водорастворимые поддержки"],
+    "PETG BIOCIDE": [
+      1.27,
+      2.86 * 5,
+      "антибактериальный, средняя химостойкость",
+    ],
   };
   // Элементы формы
   const el = {
@@ -119,6 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sendBtn: document.getElementById("sendBtn"),
     detailName: document.getElementById("detailName"),
     workDesc: document.getElementById("workDesc"),
+    userPrintMode: document.getElementById("userPrintMode"),
   };
   // Функция наполнения списка материалов с фильтрацией
   function populateMaterials(type = "all") {
@@ -204,8 +227,27 @@ document.addEventListener("DOMContentLoaded", () => {
       el.deadline,
     ].forEach((inp) => inp && inp.addEventListener(evt, calc));
   });
-  // Функция расчёта
+  // Функция для расчета стоимости TPU
+  function priceTPU(m) {
+    if (isNaN(m) || m <= 0) return 0;
+    let costGrams = 0;
+    // пробегаем k=0,1,2,... пока 200*k < m
+    for (let k = 0; 200 * k < m; k++) {
+      // сколько грамм в текущем «окне»  [200k, 200k+100]
+      const segment = Math.min(Math.max(m - 200 * k, 0), 100);
+      costGrams += segment;
+    }
+    return costGrams * 75;
+  }
+  // Основная функция расчета
   function calc() {
+    if (!dimensionButtons) return; // Защита от вызова до инициализации
+
+    const activeButton = dimensionButtons.querySelector("button.active");
+    if (el.userPrintMode) {
+      el.userPrintMode.value = activeButton ? activeButton.textContent : "3D";
+    }
+
     const sel = el.material.value;
     if (!materials[sel]) {
       el.result.textContent = "Выберите материал.";
@@ -329,7 +371,16 @@ document.addEventListener("DOMContentLoaded", () => {
       qualityMap[el.qualBtns.querySelector("button.active").dataset.quality];
     const totalMass = mass * fillFactor;
     const qty = Math.max(parseInt(el.qty.value) || 1, 1);
-    const cost = totalMass * price * qty * qFactor;
+    let cost = 0;
+
+    if (sel.startsWith("TPU")) {
+      cost = priceTPU(totalMass);
+    } else {
+      cost = totalMass * price * qty * qFactor;
+    }
+
+    cost *= dimensionCoefficient;
+
     el.result.innerHTML = `Ориентировочная стоимость: ${cost.toFixed(
       2
     )} ₽<br>Минимальный заказ 2500 рублей<br><small>Расчет примерный. Менеджер позвонит для подтверждения заказа</small>`;
@@ -401,7 +452,42 @@ document.addEventListener("DOMContentLoaded", () => {
       el.userQuality.value =
         el.qualBtns.querySelector("button.active").textContent;
   }
+  // Инициализация элементов интерфейса
+  dimensionButtons = document.getElementById("dimensionButtons");
+
+  // Установка начального состояния
+  dimensionButtons.querySelector("#btn3D").classList.add("active");
+  if (el.userPrintMode) {
+    el.userPrintMode.value = "3D";
+  }
+
+  // Обработчик кнопок 3D/5D
+  dimensionButtons.addEventListener("click", (e) => {
+    if (e.target.tagName === "BUTTON") {
+      // Снимаем выделение со всех кнопок
+      dimensionButtons.querySelectorAll("button").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+
+      // Устанавливаем активную кнопку
+      e.target.classList.add("active");
+
+      // Обновляем коэффициент
+      dimensionCoefficient = parseFloat(e.target.dataset.coefficient);
+
+      // Обновляем поле режима печати
+      if (el.userPrintMode) {
+        el.userPrintMode.value = e.target.textContent;
+      }
+
+      // Пересчитываем стоимость
+      calc();
+    }
+  });
+
+  // Первоначальный расчет
   calc();
+
   // Телефон и email валидация при вводе
   const phone = document.getElementById("userPhone");
   phone.addEventListener("input", () => {
@@ -527,7 +613,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fileInput.value = ""; // Reset file input
       })
       .catch((error) => {
-        console.error("Error details:", error);
         el.statusMsg.textContent = `Ошибка при отправке заявки: ${error.message}`;
         el.statusMsg.style.color = "#f44336";
       })

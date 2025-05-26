@@ -8,7 +8,14 @@
   </head>
   <body>
     <div class="container">
-      <h1>Калькулятор 3D печати</h1>
+      <h1>
+        Калькулятор
+        <div id="dimensionButtons">
+          <button id="btn3D" data-coefficient="1" class="active">3D</button>
+          <button id="btn5D" data-coefficient="2.25">5D</button>
+        </div>
+        печати
+      </h1>
       <div class="filter-buttons" id="filterButtons">
         <button data-type="all" class="active">Все</button>
         <button data-type="инженерный">Инженерные</button>
@@ -21,9 +28,9 @@
         <select id="material"></select>
         <div id="materialInfo" class="material-info"></div>
       </div>
-      <div class="tab-buttons">
-        <button id="massTabBtn" class="active">По массе</button>
-        <button id="volumeTabBtn">По объему</button>
+      <div id="massVolumeButtons">
+        <button id="massTabBtn" class="active">Масса</button>
+        <button id="volumeTabBtn">Габариты</button>
       </div>
       <div id="massTab" class="tab-content">
         <div class="form-group">
@@ -189,6 +196,10 @@
           <div class="parameter-line">
             <span>Высота слоя:</span>
             <input type="text" id="userQuality" readonly />
+          </div>
+          <div class="parameter-line">
+            <span>Режим печати:</span>
+            <input type="text" id="userPrintMode" readonly />
           </div>
         </div>
         <div class="checkbox-group">
