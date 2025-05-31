@@ -16,6 +16,29 @@
         </div>
         печати
       </h1>
+
+      <!-- Ссылка на каталог товаров -->
+      <div style="text-align: center; margin-bottom: 20px">
+        <a
+          href="table_tovar.html"
+          style="
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2196f3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          "
+          onmouseover="this.style.backgroundColor='#1976D2'"
+          onmouseout="this.style.backgroundColor='#2196F3'"
+        >
+          📋 Посмотреть каталог товаров
+        </a>
+      </div>
       <div class="filter-buttons" id="filterButtons">
         <button data-type="all" class="active">Все</button>
         <button data-type="инженерный">Инженерные</button>
@@ -233,6 +256,69 @@
         <p id="statusMsg"></p>
       </div>
     </div>
+
+    <!-- Футер с контактной информацией -->
+    <footer
+      style="
+        text-align: center;
+        padding: 20px;
+        margin-top: 30px;
+        background-color: #f5f5f5;
+        border-top: 1px solid #ddd;
+        font-size: 14px;
+        color: #666;
+      "
+    >
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 15px;
+        "
+      >
+        <a
+          href="https://3dzipper.ru"
+          target="_blank"
+          style="color: #4caf50; text-decoration: none; font-weight: bold"
+        >
+          🌐 3dzipper.ru
+        </a>
+        <span style="color: #ccc">|</span>
+        <a
+          href="https://5dsap.ru"
+          target="_blank"
+          style="color: #4caf50; text-decoration: none; font-weight: bold"
+        >
+          🌐 5dsap.ru
+        </a>
+        <span style="color: #ccc">|</span>
+        <a
+          href="mailto:info@5dsap.ru"
+          style="color: #ff6b35; text-decoration: none; font-weight: bold"
+        >
+          📧 info@5dsap.ru
+        </a>
+        <span style="color: #ccc">|</span>
+        <a
+          href="https://wa.me/+79607418138"
+          target="_blank"
+          style="color: #25d366; text-decoration: none; font-weight: bold"
+        >
+          📱 WhatsApp
+        </a>
+        <span style="color: #ccc">|</span>
+        <a
+          href="https://t.me/+79607418138"
+          target="_blank"
+          style="color: #0088cc; text-decoration: none; font-weight: bold"
+        >
+          💬 Telegram
+        </a>
+      </div>
+    </footer>
+
     <script src="js/script.js"></script>
   </body>
 </html>
